@@ -1,0 +1,51 @@
+#include <ESP32Servo.h>
+
+// GPIO pins that the 2 Photoresistors are connected to (through a voltage divider)
+const photoPin1 = 12;
+const photoPin2 = 14;
+
+// created servo obj
+Servo myServo;
+
+// Variables to store light levels (Photo resistor into voltage divider to get a light level reading )
+int lightLevel1 = 0;
+int lightLevel2 = 0;
+
+// The threshold by which the difference in light levels must exceed for the motor to move.
+// Still testing with thresholds for best resutls******
+int threshold = 0;
+
+void setup() {
+  Serial.begin(115200);
+  delay(1000);
+
+//The servo is attached to GPIO 13
+  myServo.attach(13);
+}
+
+void loop() {
+// Reads light levels given through GPIO pins designated earlier from both Photoresistors
+  lightLevel1 = analogRead(photoPin1);
+  lightLevel2 = analogRead(photoPin2);
+  Serial.println("Light Level 1: ");
+  Serial.println([photoPin1]);
+  Serial.println("Light Level 2: ");
+  Serial.println([photoPin2]);
+
+// Reads the servo angle
+  int servoAngle = myServo.read();
+
+  // Moves motor in the direction of stronger light levels
+  if (lightLevel1 > (lightLevel2 + threshold) && servoAngle < 180 ) {
+    myServo.write(servoAngle + 1);
+  }
+  else if (lightLevel2 > (lightLevel1 + threshold) && servoAngle > 0){
+    myServo.write(servoAngle - 1);
+  }
+//Prints Servo Angle
+  Serial.println("Servo Angle: ");
+  Serial.println(servoAngle);
+
+//Lower delay when testing
+  delay(500);
+}
